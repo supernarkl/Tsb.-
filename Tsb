@@ -1,0 +1,288 @@
+-- Load Orion Library
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+-- Create a UI Window
+local Window = OrionLib:MakeWindow({
+    Name = "The Strongest Battlegrounds - Script Hub by Sendox",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "OrionStrongest"
+})
+
+-- Create Main Tab
+local MainTab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Add "Voidkill GUI" Button to the Main Tab
+MainTab:AddButton({
+    Name = "Voidkill GUI",
+    Callback = function()
+        -- Execute Voidkill GUI code
+        local a = Instance.new("ScreenGui")
+        local b = Instance.new("TextButton")
+        local d = false
+
+        a.Name = "ControlGui"
+        a.ResetOnSpawn = false
+        a.IgnoreGuiInset = true
+        a.Parent = game.CoreGui
+
+        local function e(f, g, h)
+            f.Name = g
+            f.Text = g
+            f.Size = UDim2.new(0, 120, 0, 50)
+            f.Position = h
+            f.BackgroundColor3 = Color3.new(0.2, 0.6, 0.8)
+            f.TextColor3 = Color3.new(1, 1, 1)
+            f.Font = Enum.Font.GothamBold
+            f.TextSize = 16
+            f.BorderSizePixel = 2
+            f.BorderColor3 = Color3.new(0.1, 0.3, 0.4)
+            f.Parent = a
+        end
+
+        -- Only the "tasumaki voidkill" button is created
+        e(b, "tasumaki voidkill", UDim2.new(0.5, -130, 0.5, -25))
+
+        local function i(f)
+            local j, k, l, m
+            local function n(o)
+                local p = o.Position - l
+                f.Position = UDim2.new(m.X.Scale, m.X.Offset + p.X, m.Y.Scale, m.Y.Offset + p.Y)
+            end
+
+            f.InputBegan:Connect(function(o)
+                if o.UserInputType == Enum.UserInputType.MouseButton1 or o.UserInputType == Enum.UserInputType.Touch then
+                    j = true
+                    l = o.Position
+                    m = f.Position
+                    o.Changed:Connect(function()
+                        if o.UserInputState == Enum.UserInputState.End then
+                            j = false
+                        end
+                    end)
+                end
+            end)
+
+            f.InputChanged:Connect(function(o)
+                if o.UserInputType == Enum.UserInputType.MouseMovement or o.UserInputType == Enum.UserInputType.Touch then
+                    k = o
+                end
+            end)
+
+            game:GetService("UserInputService").InputChanged:Connect(function(o)
+                if o == k and j then
+                    n(o)
+                end
+            end)
+        end
+
+        i(b)
+
+        local function q(r)
+            local s = game:GetService('VirtualInputManager')
+            s:SendKeyEvent(true, r, false, game)
+            wait(0.0001)
+            s:SendKeyEvent(false, r, false, game)
+        end
+
+        local function t()
+            local u = game.Players.LocalPlayer
+            local v = u.Character
+            if v then
+                local w = v.HumanoidRootPart.CFrame
+                v.HumanoidRootPart.CFrame = CFrame.new(12968, 1583, -341)
+                wait(3)
+                v.HumanoidRootPart.CFrame = w
+            end
+            print("Void operation completed.")
+        end
+
+        -- The "tasumaki voidkill" button click event
+        b.MouseButton1Click:Connect(function()
+            if d then return end
+            d = true
+            q(Enum.KeyCode.One)
+            wait(0.000001)
+            t()
+            d = false
+        end)
+    end
+})
+
+-- Add "Auto-Farm" Button to the Main Tab
+MainTab:AddButton({
+    Name = "Auto-Farm",
+    Callback = function()
+        -- Auto-Farm functionality
+        _G.AutoFarmEnabled = true
+
+        local player = game.Players.LocalPlayer
+        local lastTarget = nil
+
+        while _G.AutoFarmEnabled do
+            -- Find the nearest player
+            local targetPlayer = nil
+            local closestDistance = math.huge
+
+            for _, target in pairs(game.Players:GetPlayers()) do
+                if target ~= player and target.Character and target.Character:FindFirstChild("Humanoid") then
+                    local distance = (player.Character.HumanoidRootPart.Position - target.Character.HumanoidRootPart.Position).Magnitude
+                    if distance < closestDistance then
+                        closestDistance = distance
+                        targetPlayer = target
+                    end
+                end
+            end
+
+            -- If a target player is found
+            if targetPlayer then
+                -- Move behind the target player (closer than before)
+                local targetHumanoidRootPart = targetPlayer.Character.HumanoidRootPart
+                player.Character.HumanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.new(0, 0, 3) -- Move 3 studs behind the target player
+            end
+
+            -- If the target player dies, find a new target
+            if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("Humanoid") or targetPlayer.Character.Humanoid.Health <= 0 then
+                print("Target died, finding a new target.")
+                wait(2) -- Wait for 2 seconds before switching target
+            end
+
+            wait(0.1) -- Wait for 0.1 seconds before moving again
+        end
+    end
+})
+
+-- Add "Stop Auto-Farm" Button to the Main Tab
+MainTab:AddButton({
+    Name = "Stop Auto-Farm",
+    Callback = function()
+        -- Stop Auto-Farm
+        _G.AutoFarmEnabled = false
+        print("Auto-Farm has been stopped.")
+    end
+})
+
+-- Create Player Tab
+local PlayerTab = Window:MakeTab({
+    Name = "Player",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Speed Toggle Button (Set Speed to 50 and keep it constant)
+local speedToggleEnabled = false  -- Track if speed toggle is on
+
+PlayerTab:AddButton({
+    Name = "Speed 50",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local humanoid = player.Character:WaitForChild("Humanoid")
+
+        -- Toggle speed on or off
+        speedToggleEnabled = not speedToggleEnabled
+        
+        if speedToggleEnabled then
+            humanoid.WalkSpeed = 50  -- Set speed to 50
+            print("Speed set to 50 and locked")
+        else
+            humanoid.WalkSpeed = 16  -- Reset speed to default
+            print("Speed reset to default")
+        end
+    end
+})
+
+-- Keep Speed at 50 Forever (Even if anything else changes it)
+game:GetService("RunService").Heartbeat:Connect(function()
+    local player = game.Players.LocalPlayer
+    local humanoid = player.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        if speedToggleEnabled then
+            humanoid.WalkSpeed = 50  -- Maintain speed at 50 while toggle is on
+        end
+    end
+end)
+
+-- No Clip Button
+PlayerTab:AddButton({
+    Name = "No Clip",
+    Callback = function()
+        local character = game.Players.LocalPlayer.Character
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+        -- Toggle NoClip
+        local function toggleNoClip(value)
+            if value then
+                humanoidRootPart.CanCollide = false
+                for _, part in pairs(character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+                print("No Clip Activated")
+            else
+                humanoidRootPart.CanCollide = true
+                for _, part in pairs(character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+                end
+                print("No Clip Deactivated")
+            end
+        end
+
+        -- Check if NoClip is already on or off
+        if humanoidRootPart.CanCollide == true then
+            toggleNoClip(true)
+        else
+            toggleNoClip(false)
+        end
+    end
+})
+
+-- Create Scripts Tab
+local ScriptsTab = Window:MakeTab({
+    Name = "Scripts",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Infinite Yield Button
+ScriptsTab:AddButton({
+    Name = "Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()  -- Executes Infinite Yield script
+    end
+})
+
+-- Nameless Admin Button (Updated script URL)
+ScriptsTab:AddButton({
+    Name = "Nameless Admin",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Steal-Time-From-Others-UPD-NA-nameless-admin-admin-20992"))()  -- Executes new Nameless Admin script
+    end
+})
+
+-- Create Credits Tab
+local CreditsTab = Window:MakeTab({
+    Name = "Credits",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+CreditsTab:AddLabel("Script by Sendox")
+
+-- Discord Server Button in Credits Tab
+CreditsTab:AddButton({
+    Name = "Join Discord Server",
+    Callback = function()
+        -- Copy Discord invite to clipboard
+        setclipboard("https://discord.gg/sendox")
+    end
+})
+
+-- Initialize UI
+OrionLib:Init()
